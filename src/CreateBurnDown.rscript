@@ -1,0 +1,38 @@
+#!/usr/bin/env R
+
+#maye add commandline to script
+
+#Yeah, it is a little low I know.
+scrum.points=11
+
+#format YYYY/MM/DD first monday of the sprint
+scrum.startdate="2016/12/05"
+scrum.sprint="95"
+scrum.days=19
+scrum.pdf=paste('scrum',scrum.sprint,'.pdf')
+
+#now with added weekends
+d <- as.POSIXlt(as.Date(scrum.startdate) + seq(from=0,to=scrum.days-1))
+d <- as.Date(subset(d,d$wday < 6 & d$wday > 0))
+scrum.guide=scrum.points-seq(from=0,to=length(d)-1)/(length(d)-1)*scrum.points
+
+pdf(file=scrum.pdf)
+
+#more room for axis
+par(mar=(c(7, 4, 4, 2) + 0.1))
+
+#initial plot for setting the plot limits and labels
+plot(d,scrum.guide,type="l",lty=2, lwd=3,xaxt="n", col = 'gray',ylab="Scrum Points",xlab="", main=paste('Burndown for sprint ',scrum.sprint))
+
+#grid over plot for easy manual drawing
+abline(v = d, col = 'lightgray', lty = 3, lwd=2)
+abline(h = seq(0, scrum.points,0.25), col = 'gray', lty = 3, lwd=c(3,1,1,1))
+
+#redraw lines because of ugly overlapping elements.
+#note that the settings below should be changed in the plot function also
+lines(d,scrum.guide,type='l', lty=2, lwd=3, col = 'gray')
+
+axis.Date(1, at = seq(d[1], d[length(d)],1), labels = seq(d[1], d[length(d)],1), format= "%d/%m", las = 2)
+
+#make dev.off() go silent
+scrum.null <- dev.off()
